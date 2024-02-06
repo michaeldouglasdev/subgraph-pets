@@ -1,0 +1,11 @@
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key"])
+
+type Query {
+  pets: [Pet]!
+}
+
+type Pet @key(fields: "id") {
+  id: ID!
+  name: String!
+  userId: ID!
+}
