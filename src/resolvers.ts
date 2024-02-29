@@ -32,7 +32,7 @@ export const resolvers: Resolvers = {
   },
   User: {
     pets: ({ id}) => {
-      return PETS.filter(pet => pet.id === id);
+      return PETS.filter(pet => pet.userId === id);
     }
   },
   Pet: {
