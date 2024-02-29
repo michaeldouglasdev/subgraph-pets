@@ -1,6 +1,7 @@
+import { PetModel } from "./models";
 import { Pet, Resolvers } from "./types";
 
-const PETS: Pet[] = [
+const PETS: PetModel[] = [
   {
     id: 'pet-1',
     name: 'Dogie',
@@ -27,6 +28,11 @@ export const resolvers: Resolvers = {
   Query: {
     pets: (parent, args, context, info) => {
       return PETS;
+    }
+  },
+  User: {
+    pets: ({ id}) => {
+      return PETS.filter(pet => pet.id === id);
     }
   },
   Pet: {

@@ -1,4 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql';
+import { PetModel } from './models';
 import { Context } from './context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -7,6 +8,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -17,15 +19,26 @@ export type Scalars = {
   _FieldSet: { input: any; output: any; }
 };
 
+export type MutationResponse = {
+  code: Scalars['Int']['output'];
+  message: Scalars['String']['output'];
+  success: Scalars['Boolean']['output'];
+};
+
 export type Pet = {
   __typename?: 'Pet';
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-  userId: Scalars['ID']['output'];
 };
 
 export type Query = {
   __typename?: 'Query';
+  pets: Array<Maybe<Pet>>;
+};
+
+export type User = {
+  __typename?: 'User';
+  id: Scalars['ID']['output'];
   pets: Array<Maybe<Pet>>;
 };
 
@@ -109,30 +122,46 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 ) => TResult | Promise<TResult>;
 
 
+/** Mapping of interface types */
+export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = ResolversObject<{
+  MutationResponse: never;
+}>;
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
-  Pet: ResolverTypeWrapper<Pet>;
-  ID: ResolverTypeWrapper<Scalars['ID']['output']>;
+  MutationResponse: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['MutationResponse']>;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
-  Query: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  Pet: ResolverTypeWrapper<PetModel>;
+  ID: ResolverTypeWrapper<Scalars['ID']['output']>;
+  Query: ResolverTypeWrapper<{}>;
+  User: ResolverTypeWrapper<Omit<User, 'pets'> & { pets: Array<Maybe<ResolversTypes['Pet']>> }>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  Pet: Pet;
-  ID: Scalars['ID']['output'];
+  MutationResponse: ResolversInterfaceTypes<ResolversParentTypes>['MutationResponse'];
+  Int: Scalars['Int']['output'];
   String: Scalars['String']['output'];
-  Query: {};
   Boolean: Scalars['Boolean']['output'];
+  Pet: PetModel;
+  ID: Scalars['ID']['output'];
+  Query: {};
+  User: Omit<User, 'pets'> & { pets: Array<Maybe<ResolversParentTypes['Pet']>> };
+}>;
+
+export type MutationResponseResolvers<ContextType = Context, ParentType extends ResolversParentTypes['MutationResponse'] = ResolversParentTypes['MutationResponse']> = ResolversObject<{
+  __resolveType: TypeResolveFn<null, ParentType, ContextType>;
+  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 }>;
 
 export type PetResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Pet'] = ResolversParentTypes['Pet']> = ResolversObject<{
   __resolveReference?: ReferenceResolver<Maybe<ResolversTypes['Pet']>, { __typename: 'Pet' } & GraphQLRecursivePick<ParentType, {"id":true}>, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  userId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -140,8 +169,17 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   pets?: Resolver<Array<Maybe<ResolversTypes['Pet']>>, ParentType, ContextType>;
 }>;
 
+export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
+  __resolveReference?: ReferenceResolver<Maybe<ResolversTypes['User']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {"id":true}>, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  pets?: Resolver<Array<Maybe<ResolversTypes['Pet']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type Resolvers<ContextType = Context> = ResolversObject<{
+  MutationResponse?: MutationResponseResolvers<ContextType>;
   Pet?: PetResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  User?: UserResolvers<ContextType>;
 }>;
 
